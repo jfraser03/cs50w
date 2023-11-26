@@ -1,0 +1,51 @@
+#a-img-container {
+    width: 100px;
+    height: 50px;
+    margin: 30px 50px;
+    position: relative;
+    left: 0;
+}
+
+#a-title {
+    color: red;
+    font-weight: normal;
+    margin-left: 100px;
+}
+
+#find-pages {
+    font-weight: normal;
+    color: gray;
+    margin-left: 100px;
+}
+
+#a-field-container {
+    justify-content: space-between;
+    align-items: center;
+    margin-left: 100px;
+    width: 800px;
+}
+
+#a-field-container input {
+    justify-content: flex-end;
+    border-radius: 0px;
+}
+
+#a-field-container label {
+    color: gray;
+}
+
+#advanced-button {
+    background-color: #4287f5;
+    color: white;
+    font-weight: bold;
+}
+
+#a-btn-container {
+    width: 900px;
+    justify-content: flex-end;
+
+}
+
+#advanced-button:hover {
+    background-color: #3d7adb;
+}
