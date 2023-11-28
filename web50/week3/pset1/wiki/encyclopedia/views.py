@@ -4,6 +4,8 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from markdown2 import Markdown
 
+import random
+
 from . import util
 from .helpers import create_entry, get_content, handle_post_search, EntryForm
 
@@ -59,8 +61,8 @@ def new(request):
         })
     
     elif request.method == "POST":
-        entry = request.POST.get('new_entry')
-        content = request.POST.get('new_content')
+        entry = request.POST.get('entry_field')
+        content = request.POST.get('content_field')
 
         entries = util.list_entries()
 
@@ -76,12 +78,20 @@ def new(request):
 @handle_post_search
 def edit(request, entry):
     if request.method == "GET":
-        content = get_content(entry)
+        content = util.get_entry(entry)
         form = EntryForm({"content_field": content, "entry_field": entry})
 
+        return render(request, "encyclopedia/edit.html", {
+            "entry": entry,
+            "form": form
+        })
 
-    return render(request, "encyclopedia/edit.html", {
-        "entry": entry,
-        "form": form
-    })
-        
+    elif request.method == "POST":
+        content = request.POST.get("content_field")
+        create_entry(entry, content)
+
+        return redirect(reverse("entry", args=[entry]))
+    
+def random_page(request):
+    choice = random.choice(util.list_entries())
+    return HttpResponseRedirect(reverse("entry", args=[choice]))
