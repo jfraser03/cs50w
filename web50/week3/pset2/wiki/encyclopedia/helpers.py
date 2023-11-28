@@ -7,9 +7,12 @@ from django import forms
 from . import util
 
 def create_entry(entry, content):
-
     with open(f"entries/{entry}.md", 'w') as file:
         file.write(content)
+
+def get_content(entry):
+    with open(f"entries/{entry}.md", 'r') as file:
+        return file.read()
  
 def handle_post_search(f):
     def wrapper (request, *args, **kwargs):
@@ -24,7 +27,6 @@ def handle_post_search(f):
         return f(request, *args, **kwargs)
     return wrapper
 
-class NewEntryForm(forms.Form):
-    new_entry = forms.CharField(max_length=20)
-    new_content = forms.CharField(widget=forms.Textarea)
-
+class EntryForm(forms.Form):
+    entry_field = forms.CharField(max_length=20)
+    content_field = forms.CharField(widget=forms.Textarea)

@@ -5,7 +5,7 @@ from django.urls import reverse
 from markdown2 import Markdown
 
 from . import util
-from .helpers import create_entry, handle_post_search, NewEntryForm
+from .helpers import create_entry, get_content, handle_post_search, EntryForm
 
 markdown = Markdown()
 
@@ -30,6 +30,9 @@ def info(request, entry):
             "entry": entry,
             "entry_content": entry_content
         })
+    
+    elif request.method == "POST":
+        return HttpResponseRedirect(reverse("edit", args=[entry]))
 
 @handle_post_search
 def search(request):
@@ -52,7 +55,7 @@ def search(request):
 def new(request):
     if request.method == "GET":
         return render(request, "encyclopedia/new.html", {
-            "form": NewEntryForm()
+            "form": EntryForm()
         })
     
     elif request.method == "POST":
@@ -69,3 +72,16 @@ def new(request):
         create_entry(entry, content)
 
         return HttpResponseRedirect(reverse("entry", args=[entry]))
+    
+@handle_post_search
+def edit(request, entry):
+    if request.method == "GET":
+        content = get_content(entry)
+        form = EntryForm({"content_field": content, "entry_field": entry})
+
+
+    return render(request, "encyclopedia/edit.html", {
+        "entry": entry,
+        "form": form
+    })
+        
