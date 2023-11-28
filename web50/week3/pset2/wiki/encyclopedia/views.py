@@ -5,21 +5,9 @@ from django.urls import reverse
 from markdown2 import Markdown
 
 from . import util
+from .helpers import create_entry, handle_post_search, NewEntryForm
 
 markdown = Markdown()
-
-def handle_post_search(f):
-    def wrapper (request, *args, **kwargs):
-        if request.method == "POST":
-            search = request.POST.get('q')
-            if not search:
-                return
-            elif search in util.list_entries():
-                return HttpResponseRedirect(reverse("entry", args=[search]))
-            else:
-                return HttpResponseRedirect(reverse("search") + f"?q={search}")
-        return f(request, *args, **kwargs)
-    return wrapper
 
 @handle_post_search
 def index(request):
@@ -42,7 +30,7 @@ def info(request, entry):
             "entry": entry,
             "entry_content": entry_content
         })
-    
+
 @handle_post_search
 def search(request):
     if request.method == "GET":
@@ -63,4 +51,21 @@ def search(request):
 @handle_post_search
 def new(request):
     if request.method == "GET":
-        return render(request, "encyclopedia/new.html")
+        return render(request, "encyclopedia/new.html", {
+            "form": NewEntryForm()
+        })
+    
+    elif request.method == "POST":
+        entry = request.POST.get('new_entry')
+        content = request.POST.get('new_content')
+
+        entries = util.list_entries()
+
+        if entry in entries:
+            raise Http404("Entry already exists.")
+
+        content = f"# {entry}\n\n{content}"
+
+        create_entry(entry, content)
+
+        return HttpResponseRedirect(reverse("entry", args=[entry]))
