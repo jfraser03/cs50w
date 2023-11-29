@@ -1,3 +1,3 @@
 # Balls
 
-For some sports. I just learned that not all sports need balls.
+For some sports. Most sports need balls. not all
