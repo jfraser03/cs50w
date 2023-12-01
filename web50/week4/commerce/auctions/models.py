@@ -47,6 +47,13 @@ class ListCat(models.Model):
 
     def __str__(self):
         return f"Listing: {self.listing.title} | Category: {self.category.title}"
+    
+class ListUser(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.listing.title} owned by {self.user.username}"
 
 class Bid(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
