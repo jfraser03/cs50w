@@ -1,27 +1,35 @@
 {% extends "auctions/layout.html" %}
 {% load static %}
 
+{% block title %}
+    {{ listing }}
+{% endblock %}
+
 {% block head %}
     <link href="{% static 'auctions/custom.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+    <h2>{{ listing.title }}</h2>
 
-    {% for listing in active_listings %}
     <div class="listing-card">
         <div class="img-frame">
             <img src="/media/{{ listing.photo }}" alt="Image of {{ listing.title }}">
         </div>
         <div class="info-container">
-            <a href="{% url 'listing' %}?id={{ listing.id }}">
-                <h4>{{ listing.title }}</h4>
-            </a>
+            <h4>Listing: {{ listing.title }}</h4>
+            {% if watchlist %}
+                <p>Watchlist</p>
+            {% endif %}
             <p>Price: ${{ listing.price }}</p>
             <p>{{ listing.description }}</p>
         </div>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="listing_id" value="{{ listing.id }}">
+            <button type="submit">Add to Watchlist</button>
+        </form>
 
     </div>
-    {% endfor %}
 
 {% endblock %}

@@ -6,11 +6,14 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import ListingForm
-from .models import User, Listing, Category, ListCat, ListUser
+from .models import User, Listing, Category, ListCat, ListUser, Watchlist
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    listings = Listing.objects.filter(active=True)
+    return render(request, "auctions/index.html", {
+        "active_listings": listings
+    })
 
 
 def login_view(request):
@@ -89,3 +92,41 @@ def create(request):
             ListUser.objects.create(listing=new_listing, user=request.user)
 
         return HttpResponseRedirect(reverse("index"))
+
+def listing(request):
+    def load_listing():
+            listing_id = request.GET.get("id")
+            listing_object = Listing.objects.get(id=listing_id)
+
+            if Watchlist.objects.filter(user=request.user, listing=listing_object):
+                watchlist = True
+            else:
+                watchlist = False
+
+            category = ListCat.objects.get(listing=listing_object).category
+            poster = ListUser.objects.get(listing=listing_object).user
+            
+            return render(request, "auctions/listing.html", {
+                "listing": listing_object,
+                "watchlist": watchlist,
+                "category": category,
+                "poster": poster
+            })
+
+    if request.method == "GET":
+        return load_listing()
+        
+    elif request.method == "POST":
+        listing_id = request.POST.get("listing_id")
+        listing = Listing.objects.get(id=listing_id)
+
+        add_to_watchlist = Watchlist(user=request.user, listing=listing)
+        add_to_watchlist.save()
+
+        return load_listing()
+
+
+
+
+
+
