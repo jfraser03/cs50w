@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .forms import ListingForm
+from .models import User, Listing, Category, ListCat, ListUser
 
 
 def index(request):
@@ -61,3 +63,29 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "auctions/register.html")
+        
+    
+@login_required(login_url="/login")
+def create(request):
+    if request.method == "GET":
+        return render(request, "auctions/create.html", {
+            "form": ListingForm()
+        })
+    
+    elif request.method == "POST":
+        form = ListingForm(request.POST)
+
+        if form.is_valid():
+            listing_data = {}
+            for name, value in form.cleaned_data.items():
+                if name != "category":
+                    listing_data[name] = value
+
+            new_listing = Listing.objects.create(**listing_data)
+            category_id = form.cleaned_data["category"]
+            category_object = Category.objects.get(id=category_id)
+
+            ListCat.objects.create(listing=new_listing, category=category_object)
+            ListUser.objects.create(listing=new_listing, user=request.user)
+
+        return HttpResponseRedirect(reverse("index"))
