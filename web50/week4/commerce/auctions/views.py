@@ -97,10 +97,13 @@ def listing(request):
     def load_listing():
             listing_id = request.GET.get("id")
             listing_object = Listing.objects.get(id=listing_id)
-
-            if Watchlist.objects.filter(user=request.user, listing=listing_object):
-                watchlist = True
-            else:
+            
+            try:
+                if Watchlist.objects.filter(user=request.user, listing=listing_object):
+                    watchlist = True
+                else:
+                    watchlist = False
+            except TypeError:
                 watchlist = False
 
             category = ListCat.objects.get(listing=listing_object).category
@@ -117,6 +120,9 @@ def listing(request):
         return load_listing()
         
     elif request.method == "POST":
+        if not request.user.is_authenticated:
+            return HttpResponseRedirect(reverse("login"))
+
         listing_id = request.POST.get("listing_id")
         listing = Listing.objects.get(id=listing_id)
 

@@ -10,19 +10,18 @@
 {% endblock %}
 
 {% block body %}
-    <h2>{{ listing.title }}</h2>
+    <h2>Listing: {{ listing.title }}</h2>
 
-    <div class="listing-card">
-        <div class="img-frame">
+    <div>
+        {% if watchlist %}
+            <div id="watchlist"><span>Watchlist</span></div>
+        {% endif %}
+        <div class="img-frame" id="img-frame-big">
             <img src="/media/{{ listing.photo }}" alt="Image of {{ listing.title }}">
         </div>
         <div class="info-container">
-            <h4>Listing: {{ listing.title }}</h4>
-            {% if watchlist %}
-                <p>Watchlist</p>
-            {% endif %}
-            <p>Price: ${{ listing.price }}</p>
             <p>{{ listing.description }}</p>
+            <h4>${{ listing.price }}</h4>
         </div>
         <form method="POST">
             {% csrf_token %}
