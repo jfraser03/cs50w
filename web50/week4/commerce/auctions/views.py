@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
@@ -107,7 +108,13 @@ def listing(request):
                 watchlist = False
 
             category = ListCat.objects.get(listing=listing_object).category
-            poster = ListUser.objects.get(listing=listing_object).user
+
+            try:
+                poster = ListUser.objects.get(listing=listing_object)
+                poster = poster.user
+            except ListUser.DoesNotExist:
+                poster = None
+
             
             return render(request, "auctions/listing.html", {
                 "listing": listing_object,
@@ -125,9 +132,15 @@ def listing(request):
 
         listing_id = request.POST.get("listing_id")
         listing = Listing.objects.get(id=listing_id)
+        button = request.POST.get("type")
 
-        add_to_watchlist = Watchlist(user=request.user, listing=listing)
-        add_to_watchlist.save()
+        if button == "watchlist_remove":
+            watchlist = Watchlist.objects.filter(user=request.user, listing=listing).delete()
+        elif button == "watchlist_add":
+            watchlist = Watchlist(user=request.user, listing=listing)
+            watchlist.save()
+        elif button == "bid":
+            pass
 
         return load_listing()
 

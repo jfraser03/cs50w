@@ -11,11 +11,24 @@
 
 {% block body %}
     <h2>Listing: {{ listing.title }}</h2>
-
     <div>
         {% if watchlist %}
-            <div id="watchlist"><span>Watchlist</span></div>
-        {% endif %}
+        <div id="watchlist"><span>Watchlist</span></div>
+        <br>
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <input type="hidden" name="type" value="watchlist_remove">
+                <button type="submit">Remove From Watchlist</button>
+            </form>
+            {% else %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <input type="hidden" name="type" value="watchlist_add">
+                <button type="submit">Add to Watchlist</button>
+            </form>
+            {% endif %}
         <div class="img-frame" id="img-frame-big">
             <img src="/media/{{ listing.photo }}" alt="Image of {{ listing.title }}">
         </div>
@@ -23,12 +36,11 @@
             <p>{{ listing.description }}</p>
             <h4>${{ listing.price }}</h4>
         </div>
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="listing_id" value="{{ listing.id }}">
-            <button type="submit">Add to Watchlist</button>
-        </form>
-
+        <h3>Details:</h3>
+        <ul>
+            <li>Listed by: <a href="{% url 'index' %}}">{{ poster }}</a></li>
+            <li>Category: <a href="{% url 'index' %}}">{{ category }}</a></li>
+        </ul>
     </div>
 
 {% endblock %}
