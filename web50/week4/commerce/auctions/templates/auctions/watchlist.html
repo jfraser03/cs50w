@@ -1,0 +1,32 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block title %}
+    Watchlist
+{% endblock %}
+
+{% block head %}
+    <link href="{% static 'auctions/custom.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <h2>{{ user }}'s Watchlist:</h2>
+
+    {% for listing in active_listings %}
+    <div class="listing-card">
+        <div class="img-frame">
+            <img src="/media/{{ listing.photo }}" alt="Image of {{ listing.title }}">
+        </div>
+        <div class="info-container">
+            <a href="{% url 'listing' %}?id={{ listing.id }}">
+                <h4>{{ listing.title }}</h4>
+            </a>
+            <p>Price: ${{ listing.price }}</p>
+            <p>{{ listing.description }}</p>
+        </div>
+    </div>
+    {% empty %}
+    <h3>There are no active listings in your watchlist.</h3>
+    {% endfor %}
+
+{% endblock %}

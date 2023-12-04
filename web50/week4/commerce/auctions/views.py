@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import ListingForm
-from .models import User, Listing, Category, ListCat, ListUser, Watchlist
+from .models import User, Listing, Category, ListCat, ListUser, Watchlist, Bid, Comment
 
 
 def index(request):
@@ -115,12 +115,16 @@ def listing(request):
             except ListUser.DoesNotExist:
                 poster = None
 
-            
+            bids = Bid.objects.filter(listing=listing_object).count()
+            comments = Comment.objects.filter(listing=listing_object)
+
             return render(request, "auctions/listing.html", {
                 "listing": listing_object,
                 "watchlist": watchlist,
                 "category": category,
-                "poster": poster
+                "poster": poster,
+                "bids": bids,
+                "comments": comments
             })
 
     if request.method == "GET":
@@ -134,18 +138,49 @@ def listing(request):
         listing = Listing.objects.get(id=listing_id)
         button = request.POST.get("type")
 
+        # Really trusting the user here - could benefit from client and server side validation
         if button == "watchlist_remove":
             watchlist = Watchlist.objects.filter(user=request.user, listing=listing).delete()
         elif button == "watchlist_add":
             watchlist = Watchlist(user=request.user, listing=listing)
             watchlist.save()
         elif button == "bid":
-            pass
+            bid = float(request.POST.get("bid"))
+            new_bid = Bid(user=request.user, listing=listing, price=bid)
+            if bid > listing.price:
+                listing.price = bid
+                new_bid.save()
+                listing.save()
+        elif button == "comment":
+            comment = request.POST.get("comment")
+            new_comment = Comment(user=request.user, listing=listing, content=comment)
+            new_comment.save()
 
         return load_listing()
 
+def watchlist(request):
+    if request.method == "GET":
+        watchlist = Watchlist.objects.filter(user=request.user)
 
+        listings = [ob.listing for ob in watchlist]
 
+        return render(request, "auctions/watchlist.html", {
+            "active_listings": listings,
+            "user": request.user
+        })
 
+def categories(request, category=None):
+    if category == None:
+        cats = Category.objects.all()
 
-
+        return render(request, "auctions/categories.html", {
+            "categories": cats
+        })
+    else:
+        cat = Category.objects.get(title=category)
+        listcat = ListCat.objects.filter(category=cat)
+        listings = [ob.listing for ob in listcat]
+        return render(request, "auctions/category.html", {
+            "category": category,
+            "active_listings": listings
+        })
