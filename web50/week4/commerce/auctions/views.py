@@ -7,7 +7,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import ListingForm
-from .models import User, Listing, Category, ListCat, ListUser, Watchlist, Bid, Comment
+from .models import User, Listing, Category, ListCat, ListUser, Watchlist, Bid, Comment, Winners
 
 
 def index(request):
@@ -98,7 +98,7 @@ def listing(request):
     def load_listing():
             listing_id = request.GET.get("id")
             listing_object = Listing.objects.get(id=listing_id)
-            
+
             try:
                 if Watchlist.objects.filter(user=request.user, listing=listing_object):
                     watchlist = True
@@ -117,15 +117,26 @@ def listing(request):
 
             bids = Bid.objects.filter(listing=listing_object).count()
             comments = Comment.objects.filter(listing=listing_object)
+            owner = ListUser.objects.get(listing=listing_object).user
 
-            return render(request, "auctions/listing.html", {
-                "listing": listing_object,
-                "watchlist": watchlist,
-                "category": category,
-                "poster": poster,
-                "bids": bids,
-                "comments": comments
-            })
+            inputs = {
+                    "listing": listing_object,
+                    "watchlist": watchlist,
+                    "category": category,
+                    "poster": poster,
+                    "bids": bids,
+                    "comments": comments,
+                    "user": request.user,
+                    "owner": owner
+                }
+
+            if listing_object.active:
+                return render(request, "auctions/listing.html", inputs)
+            
+            else:
+                ob = Winners.objects.get(listing=listing_object)
+                inputs.update({"winner": ob.user})
+                return render(request, "auctions/closed.html", inputs)
 
     if request.method == "GET":
         return load_listing()
@@ -155,6 +166,12 @@ def listing(request):
             comment = request.POST.get("comment")
             new_comment = Comment(user=request.user, listing=listing, content=comment)
             new_comment.save()
+        elif button == "close_listing":
+            listing.active = False
+            highest_bidder = Bid.objects.filter(listing=listing).order_by("-price").first().user
+            new_winner = Winners(user=highest_bidder, listing=listing)
+            listing.save()
+            new_winner.save()
 
         return load_listing()
 
@@ -179,7 +196,7 @@ def categories(request, category=None):
     else:
         cat = Category.objects.get(title=category)
         listcat = ListCat.objects.filter(category=cat)
-        listings = [ob.listing for ob in listcat]
+        listings = [ob.listing for ob in listcat if ob.listing.active]
         return render(request, "auctions/category.html", {
             "category": category,
             "active_listings": listings

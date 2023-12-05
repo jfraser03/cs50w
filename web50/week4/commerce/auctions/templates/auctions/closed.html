@@ -1,0 +1,15 @@
+{% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block title %}
+    {{ listing }} | Closed
+{% endblock %}
+
+{% block head %}
+    <link href="{% static 'auctions/custom.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+    <h2>Listing: {{ listing.title }}</h2>
+    <p>{{ winner }} won this one.</p>
+{% endblock %}

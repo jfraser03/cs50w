@@ -12,23 +12,32 @@
 {% block body %}
     <h2>Listing: {{ listing.title }}</h2>
     <div>
-        {% if watchlist %}
-        <div id="watchlist"><span>Watchlist</span></div>
-        <br>
+        {% if user == owner %}
             <form method="POST">
                 {% csrf_token %}
                 <input type="hidden" name="listing_id" value="{{ listing.id }}">
-                <input type="hidden" name="type" value="watchlist_remove">
-                <button type="submit">Remove From Watchlist</button>
+                <input type="hidden" name="type" value="close_listing">
+                <button type="submit">Close Listing</button>
             </form>
-            {% else %}
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="listing_id" value="{{ listing.id }}">
-                <input type="hidden" name="type" value="watchlist_add">
-                <button type="submit">Add to Watchlist</button>
-            </form>
+        {% else %}
+            {% if watchlist %}
+            <div id="watchlist"><span>Watchlist</span></div>
+            <br>
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <input type="hidden" name="type" value="watchlist_remove">
+                    <button type="submit">Remove From Watchlist</button>
+                </form>
+                {% else %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <input type="hidden" name="type" value="watchlist_add">
+                    <button type="submit">Add to Watchlist</button>
+                </form>
             {% endif %}
+        {% endif %}
         <div class="img-frame" id="img-frame-big">
             <img src="/media/{{ listing.photo }}" alt="Image of {{ listing.title }}">
         </div>
@@ -52,8 +61,10 @@
         <h3>Comments:</h3>
         {% for comment in comments %}
             <div>
-                <p style="border: 1px solid;">{{ comment.content }}</p>
-                <p>{{ comment.user }}</p>
+                <hr>
+                <p>"{{ comment.content }}"</p>
+                <p>-{{ comment.user }}</p>
+                <hr>
             </div>
         {% empty %}
             <p>Be the first to comment!</p>

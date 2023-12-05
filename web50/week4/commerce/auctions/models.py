@@ -62,3 +62,10 @@ class Bid(models.Model):
 
     def __str__(self):
         return f"{self.user.username} | Bid: {self.listing.title} | Amount: {self.price}"
+    
+class Winners(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.user.username} Won: {self.listing.title}"
