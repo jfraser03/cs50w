@@ -20,22 +20,24 @@
                 <button type="submit">Close Listing</button>
             </form>
         {% else %}
-            {% if watchlist %}
-            <div id="watchlist"><span>Watchlist</span></div>
-            <br>
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
-                    <input type="hidden" name="type" value="watchlist_remove">
-                    <button type="submit">Remove From Watchlist</button>
-                </form>
-                {% else %}
-                <form method="POST">
-                    {% csrf_token %}
-                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
-                    <input type="hidden" name="type" value="watchlist_add">
-                    <button type="submit">Add to Watchlist</button>
-                </form>
+            {% if user.is_authenticated %}
+                {% if watchlist %}
+                <div id="watchlist"><span>Watchlist</span></div>
+                <br>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                        <input type="hidden" name="type" value="watchlist_remove">
+                        <button type="submit">Remove From Watchlist</button>
+                    </form>
+                    {% else %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                        <input type="hidden" name="type" value="watchlist_add">
+                        <button type="submit">Add to Watchlist</button>
+                    </form>
+                {% endif %}
             {% endif %}
         {% endif %}
         <div class="img-frame" id="img-frame-big">
@@ -45,13 +47,14 @@
             <p>{{ listing.description }}</p>
             <h4>${{ listing.price }}</h4>
             <p>{{ bids }} bid(s) so far.</p>
-            <form method="POST">
-                {% csrf_token %}
-                <input type="hidden" name="listing_id" value="{{ listing.id }}">
-                <input type="number" min="{{ listing.price }}" placeholder="Bid" name="bid">
-                <button type="submit" name="type" value="bid">Place Bid</button>
-            </form>
-
+            {% if user.is_authenticated %}
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                    <input type="number" min="{{ listing.price }}" placeholder="Bid" name="bid">
+                    <button type="submit" name="type" value="bid">Place Bid</button>
+                </form>
+            {% endif %}
         </div>
         <h3>Details:</h3>
         <ul>
@@ -69,12 +72,14 @@
         {% empty %}
             <p>Be the first to comment!</p>
         {% endfor %}
-        <form method="POST">
-            {% csrf_token %}
-            <input type="hidden" name="listing_id" value="{{ listing.id }}">
-            <textarea placeholder="Comment:" name="comment"></textarea>
-            <button type="submit" name="type" value="comment">Make Comment</button>
-        </form>
+        {% if user.is_authenticated %}
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="listing_id" value="{{ listing.id }}">
+                <textarea placeholder="Comment:" name="comment"></textarea>
+                <button type="submit" name="type" value="comment">Make Comment</button>
+            </form>
+        {% endif %}
     </div>
 
 {% endblock %}

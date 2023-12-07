@@ -117,7 +117,10 @@ def listing(request):
 
             bids = Bid.objects.filter(listing=listing_object).count()
             comments = Comment.objects.filter(listing=listing_object)
-            owner = ListUser.objects.get(listing=listing_object).user
+            try:
+                owner = ListUser.objects.get(listing=listing_object).user
+            except ObjectDoesNotExist:
+                owner = None
 
             inputs = {
                     "listing": listing_object,
@@ -137,6 +140,7 @@ def listing(request):
                 ob = Winners.objects.get(listing=listing_object)
                 inputs.update({"winner": ob.user})
                 return render(request, "auctions/closed.html", inputs)
+            
 
     if request.method == "GET":
         return load_listing()
