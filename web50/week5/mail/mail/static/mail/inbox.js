@@ -47,26 +47,17 @@ function load_mailbox(mailbox) {
   .then(response => response.json())
   .then(emailList => {
     emailList.forEach(email => {
-      if (mailbox == "inbox"){
-        if (email.archived == false){
-          emails.push(email);
-        }
-      } else if (mailbox == "archive") {
-        if (email.archived == true){
-          emails.push(email)
-        }
-      }
-    });  
-
-    // Parse through the list of email objects and turn them into formatted HTML elements
-    emails.forEach(email => {
-
       let parentElement = document.createElement('div');
       let element = document.createElement('div');
       let sender = document.createElement('p');
       let subject = document.createElement('p');
       let timestamp = document.createElement('p');
       let archive = document.createElement('button')
+
+      if (mailbox == 'sent'){
+        archive.style.display = 'none';
+      }
+
 
       // Reflect 'opened' status in background color of each email
       if (email.read == false) {
@@ -112,7 +103,7 @@ function load_mailbox(mailbox) {
             archived: email.archived
           })
         })
-        load_mailbox('inbox')
+        location.reload()
       })
       
       // Attach each element to it's parent div and organize in the DOM
@@ -121,7 +112,7 @@ function load_mailbox(mailbox) {
       parentElement.append(archive)
       emailsView.append(parentElement)
     })
-  });
+  })
 }
 
 function send_email() {
@@ -134,12 +125,12 @@ function send_email() {
       subject: document.querySelector('#compose-subject').value,
       body: document.querySelector('#compose-body').value
     })
-  })
   .then(response => response.json())
   .then(result => {
     console.log(result);
     load_mailbox('sent');
-  });
+  })
+})
 }
 
 function load_email(email) {

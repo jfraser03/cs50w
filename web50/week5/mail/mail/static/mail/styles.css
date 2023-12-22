@@ -40,3 +40,7 @@ textarea {
 .info-label {
     font-weight: bold;
 }
+
+.preview-w-button * {
+    display: inline-block;
+}
