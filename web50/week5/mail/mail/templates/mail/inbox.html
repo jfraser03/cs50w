@@ -30,8 +30,37 @@
             <input type="submit" class="btn btn-primary"/>
         </form>
     </div>
+
+    <div id="email-view">
+        <div id="email-container">
+            <div class="info-container">
+                <p class="info-label">From:</p>
+                <p id="email-sender"></p>
+            </div>
+            <div class="info-container">
+                <p class="info-label">To:</p>
+                <p id="email-recipients"></p>
+            </div>
+            <div class="info-container">
+                <p class="info-label">Subject:</p>
+                <p id="email-subject"></p>
+            </div>
+            <div class="info-container">
+                <p class="info-label">Timestamp:</p>
+                <p id="email-timestamp"></p>
+            </div>
+            <button id="reply-button" class="btn btn-sm btn-outline-primary">Reply</button>
+        </div>
+        <hr>
+        <p id="email-body"></p>
+    </div>
+
 {% endblock %}
 
 {% block script %}
+    <script>
+        var clientEmail = "{{ request.user.email }}"
+    </script> 
     <script src="{% static 'mail/inbox.js' %}"></script>
+    
 {% endblock %}

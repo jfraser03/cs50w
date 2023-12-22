@@ -3,16 +3,40 @@ textarea {
 }
 
 .email-preview {
-    border: 1px solid black;
+    border: 1px solid gray;
     display: flex;
     justify-content: space-between;
     padding: 10px;
+    align-items: center;
+    margin: 15px;
+}
+
+.email-preview * {
+    margin: 0px 10px;
 }
 
 .timestamp {
-    color: lightgray;
+    color: gray;
+    margin-left: auto;
 }
 
 .sender {
+    display: flex;
+    font-weight: bold;
+}
+
+.subject {
+    display: flex;
+}
+
+.info-container {
+    display: flex;
+}
+
+.info-container * {
+    margin: 5px;
+}
+
+.info-label {
     font-weight: bold;
 }
