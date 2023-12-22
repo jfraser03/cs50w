@@ -28,6 +28,26 @@ function compose_email() {
   document.querySelector('#compose-body').value = '';
 }
 
+function eReply(email) {
+
+  // Show compose view and hide other views
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#email-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'block';
+
+  let subject = email.subject;
+  if (subject.slice(0, 4) != 'Re: ') {
+    subject = `Re: ${subject}`
+  }
+
+  let body = `On ${email.timestamp} ${email.sender} wrote: ${email.body}\n\n`
+
+  // Clear out composition fields
+  document.querySelector('#compose-recipients').value = email.sender;
+  document.querySelector('#compose-subject').value = subject;
+  document.querySelector('#compose-body').value = body;
+}
+
 function load_mailbox(mailbox) {
   
   // Show the mailbox and hide other views
@@ -117,7 +137,7 @@ function load_mailbox(mailbox) {
 
 function send_email() {
 
-  // Send a POST requet with the populated fields 
+  // Send a POST request with the populated fields 
   fetch('/emails', {
     method: 'POST',
     body: JSON.stringify({
@@ -125,12 +145,12 @@ function send_email() {
       subject: document.querySelector('#compose-subject').value,
       body: document.querySelector('#compose-body').value
     })
+  })
   .then(response => response.json())
   .then(result => {
     console.log(result);
     load_mailbox('sent');
   })
-})
 }
 
 function load_email(email) {
@@ -158,7 +178,7 @@ function load_email(email) {
     reply.style.display = 'block';
 
     reply.addEventListener('click', function() {
-      console.log("Add reply functionality.. probably show the compose form below the current one.")
+      eReply(email)
     })
 
     // Update email status to 'read'
@@ -170,3 +190,4 @@ function load_email(email) {
     })
   }
 }
+
