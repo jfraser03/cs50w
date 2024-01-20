@@ -1,0 +1,15 @@
+
+.bold-title {
+    font-weight: bold
+}
+
+.fancy-button {
+    color: white;
+    background-color: #4e83b5;
+    transition: background-color 0.3s
+
+}
+
+.fancy-button:hover {
+    background-color: #7ebbf2;
+}

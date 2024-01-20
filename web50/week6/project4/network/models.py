@@ -11,8 +11,8 @@ class Post(models.Model):
     datetime = models.DateTimeField()
 
 class Follow(models.Model):
-    follower = models.ForeignKey(User, on_delete=models.CASCADE)
-    following = models.ForeignKey(User, on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE, related_name="follower_set")
+    following = models.ForeignKey(User, on_delete=models.CASCADE, related_name="following_set")
 
 class Like(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
