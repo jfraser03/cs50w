@@ -1,18 +1,24 @@
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
+from django.db.models import Count
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import PostForm
-from .models import User
+from .models import User, Post
 
 
 def index(request):
     form = PostForm()
-    return render(request, "network/index.html", {
-        'form': form
-    })
+
+    # Filter posts returned based on timeline selected
+    posts = Post.objects.annotate(likes_count=Count('likes'))
+    inputs = {
+        'form': form,
+        'posts': posts,
+    }
+    return render(request, "network/index.html", inputs)
 
 
 def login_view(request):
@@ -65,3 +71,24 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+      
+
+ 
+def timeline(request, timeline):
+
+    # Filter posts 'fetch' return based on selected timeline
+
+    if timeline == 'all_posts':
+        pass
+
+    elif timeline == 'profile':
+        pass
+
+    elif timeline == 'following':
+        pass
+
+    else:
+        return JsonResponse({"error": "Invalid timeline."}, status=400)
+    
+    posts = posts.order_by("-timestamp").all()
+    return JsonResponse([post.serialize() for post in posts], safe=False)

@@ -13,3 +13,9 @@
 .fancy-button:hover {
     background-color: #7ebbf2;
 }
+
+.like-button {
+    border: none;
+    background: none;
+    cursor: pointer;
+}
