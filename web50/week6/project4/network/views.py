@@ -92,3 +92,7 @@ def timeline(request, timeline):
     
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
+
+def profile(request, profile):
+    print("Hello")
+    print(profile)
