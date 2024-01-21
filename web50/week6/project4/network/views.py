@@ -71,8 +71,6 @@ def register(request):
     else:
         return render(request, "network/register.html")
       
-
- 
 def timeline(request, timeline):
     # Filter posts 'fetch' return based on selected timeline
 
@@ -84,6 +82,11 @@ def timeline(request, timeline):
     elif timeline == 'following':
         posts = Post.objects.filter(user__in=following)
 
+    elif timeline[0] == '@':
+        # If timeline starts with @, then the route is @username
+        user = User.objects.get(username=timeline[1:])
+        posts = Post.objects.filter(user=user)
+
     else:
         return JsonResponse({"error": "Invalid timeline."}, status=400)
     
@@ -91,6 +94,7 @@ def timeline(request, timeline):
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 def profile(request, profile):
-    print("Hello")
+    print("Profile routing intitiated.")
 
-    return render(request, "network/profile.html")
+    return render(request, "network/index.html")
+

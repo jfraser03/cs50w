@@ -5,15 +5,11 @@
 {% endblock %}
 
 {% block body %}
-    <div id="all-posts-body">
-        <h2>All Posts</h2>
+    <div id="master-container">
+        <h2 id="title"></h2>
         <div class="new-post-block">
-            <h5 class="bold-title">New Post</h5>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.content }}
-                <button type="submit" class="fancy-button">Post</button>
-            </form>
+            <div id="new-post-container"></div>
+            
         </div>
         <div id="posts-container"></div>
     </div>

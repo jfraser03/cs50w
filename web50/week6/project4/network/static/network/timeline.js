@@ -1,36 +1,37 @@
 document.addEventListener('DOMContentLoaded', function() {
     
-
-    // Going to start out by coding the all-posts view
-    // Once complete, I will contain it in a block to hide-show it's views
-    // Along with others. Method from inbox.js (week5)
-
-    // Load following timeline
+    // Load 'following' timeline
     document.querySelector('#following').addEventListener('click', () => {
-        load_wall()
         load_timeline('following');
     })
     
     let route = window.location.pathname.substring(1)
     if (route.charAt(0) === '@') {
-        load_profile(route)
-        load_timeline(route)
+        load_timeline(route, 'profile')
     }
     else if (window.location.href.endsWith('#')) {
-        load_wall()
-        load_timeline('following')
+        load_timeline('following', 'default')
     }
     // Load all posts by default
     else {
-        load_wall()
-        load_timeline('all')
+        load_timeline('all', 'default')
     }
 
-    // Add pathing for Creating post here (same as inbox)
 })
 
+function load_timeline(timeline, type) {
+
+    // if type != profile or user.username == timeline
+    
+    show_new_post()
+
+    load_posts(timeline)
+
+
+}
+
 // Request a GET response from server to fetch list of post objects
-function load_timeline(timeline) {
+function load_posts(timeline) {
 
     let postContainer = document.getElementById('posts-container');
     postContainer.innerHTML = ''
@@ -62,12 +63,6 @@ function load_timeline(timeline) {
     })
 }
 
-function load_wall() {
-
-}
-
-function load_profile(user) {
-
-    // Do some stuff (show followers and stuff like that)
-
+function show_new_post() {
+    // Show new post box in DOM with functionality
 }
