@@ -6,14 +6,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Along with others. Method from inbox.js (week5)
 
     // Load following timeline
-    document.querySelector('#following').addEventListener('click', () => load_timeline('following'));
+    document.querySelector('#following').addEventListener('click', () => {
+        load_wall()
+        load_timeline('following');
+    })
     
-    let route = window.location.pathname
-    if (route.charAt(1) === '@') {
-        console.log("fuck")
+    let route = window.location.pathname.substring(1)
+    if (route.charAt(0) === '@') {
+        load_profile(route)
+        load_timeline(route)
+    }
+    else if (window.location.href.endsWith('#')) {
+        load_wall()
+        load_timeline('following')
     }
     // Load all posts by default
-    load_timeline('all')
+    else {
+        load_wall()
+        load_timeline('all')
+    }
 
     // Add pathing for Creating post here (same as inbox)
 })
@@ -24,7 +35,6 @@ function load_timeline(timeline) {
     let postContainer = document.getElementById('posts-container');
     postContainer.innerHTML = ''
 
-    let posts = [];
     fetch(`/posts/${timeline}`)
     .then(response => response.json())
     .then(postList => {
@@ -50,4 +60,14 @@ function load_timeline(timeline) {
             postContainer.append(parent);
         })
     })
+}
+
+function load_wall() {
+
+}
+
+function load_profile(user) {
+
+    // Do some stuff (show followers and stuff like that)
+
 }
