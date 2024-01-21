@@ -1,11 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
+    
 
     // Going to start out by coding the all-posts view
     // Once complete, I will contain it in a block to hide-show it's views
     // Along with others. Method from inbox.js (week5)
 
+    // Load following timeline
+    document.querySelector('#following').addEventListener('click', () => load_timeline('following'));
+    
+    let route = window.location.pathname
+    if (route.charAt(1) === '@') {
+        console.log("fuck")
+    }
     // Load all posts by default
-    load_timeline('all');
+    load_timeline('all')
 
     // Add pathing for Creating post here (same as inbox)
 })
@@ -13,12 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
 // Request a GET response from server to fetch list of post objects
 function load_timeline(timeline) {
 
-    console.log(`${timeline}`);
-
     let postContainer = document.getElementById('posts-container');
-
-    // TEST
-    
+    postContainer.innerHTML = ''
 
     let posts = [];
     fetch(`/posts/${timeline}`)

@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import PostForm
-from .models import User, Post
+from .models import User, Post, Follow
 
 
 def index(request):
@@ -16,7 +16,6 @@ def index(request):
     posts = Post.objects.annotate(likes_count=Count('likes'))
     inputs = {
         'form': form,
-        'posts': posts,
     }
     return render(request, "network/index.html", inputs)
 
@@ -75,17 +74,15 @@ def register(request):
 
  
 def timeline(request, timeline):
-    print(timeline)
     # Filter posts 'fetch' return based on selected timeline
+
+    following = [follow.following for follow in Follow.objects.filter(follower=request.user)]
 
     if timeline == 'all':
         posts = Post.objects.all()
 
-    elif timeline == 'profile':
-        pass
-
     elif timeline == 'following':
-        pass
+        posts = Post.objects.filter(user__in=following)
 
     else:
         return JsonResponse({"error": "Invalid timeline."}, status=400)
@@ -95,4 +92,5 @@ def timeline(request, timeline):
 
 def profile(request, profile):
     print("Hello")
-    print(profile)
+
+    return render(request, "network/profile.html")
