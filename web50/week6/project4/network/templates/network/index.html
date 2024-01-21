@@ -1,7 +1,11 @@
 {% extends "network/layout.html" %}
+{% load static %}
+
+{% block title %}
+{% endblock %}
 
 {% block body %}
-    <div class="all-posts-body">
+    <div id="all-posts-body">
         <h2>All Posts</h2>
         <div class="new-post-block">
             <h5 class="bold-title">New Post</h5>
@@ -11,20 +15,10 @@
                 <button type="submit" class="fancy-button">Post</button>
             </form>
         </div>
-        <div class="all-posts-container">
-            {% for post in posts %}
-                <div class="post-block">
-                    <h2>{{ post.user }}</h2>
-                    <p>{{ post.content }}</p>
-                    <p>{{ post.timestamp }}</p>
-                    <button class="like-button">🤍</button>
-                    <p>{{ post.likes_count }}</p>
-                    <p>Comment</p>
-                </div>
-            {% endfor %}
-        </div>
+        <div id="posts-container"></div>
     </div>
-    
-    ADD A SCRIPT SOURCE HERE
+{% endblock %}
 
+{% block script %}
+    <script src="{% static 'network/timeline.js' %}"></script>
 {% endblock %}

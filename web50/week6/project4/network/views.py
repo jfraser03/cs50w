@@ -75,11 +75,11 @@ def register(request):
 
  
 def timeline(request, timeline):
-
+    print(timeline)
     # Filter posts 'fetch' return based on selected timeline
 
-    if timeline == 'all_posts':
-        pass
+    if timeline == 'all':
+        posts = Post.objects.all()
 
     elif timeline == 'profile':
         pass
