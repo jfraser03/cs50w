@@ -126,7 +126,8 @@ function show_profile_info(user) {
 
 function toggle_like(post) {
 
-    // 
+    // Toggle like database on server-side when triggered
+    
     fetch(`/likes/${user_id}/${post.id}`, {
         method: 'PUT',
         headers: {
