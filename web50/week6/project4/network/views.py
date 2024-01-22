@@ -70,6 +70,7 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+    
       
 def timeline(request, timeline):
     # Filter posts 'fetch' return based on selected timeline
@@ -93,6 +94,7 @@ def timeline(request, timeline):
     posts = posts.order_by("-timestamp").all()
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
+
 def profile(request, profile):
 
     user = User.objects.get(username=profile)
@@ -101,6 +103,7 @@ def profile(request, profile):
     variables = user.serialize()
 
     return render(request, "network/index.html", variables)
+
 
 def like(request, user_id, post_id):
 
@@ -117,10 +120,32 @@ def like(request, user_id, post_id):
         except IntegrityError:
             Like.objects.get(user=user, post=post).delete()
             liked = False
-            
-    elif request.method == 'GET':
 
+    elif request.method == 'GET':
         liked = Like.objects.filter(user=user, post=post).exists()
-        print(f'{post.content} - Liked: {liked}')
 
     return JsonResponse(liked, safe=False)
+
+
+def post(request):
+
+    content = request.POST['content']
+
+    # If POST request type (custom defined) is new, make new post
+    if request.POST['type'] == 'new':
+        new_post = Post(content=content, user=request.user)
+        # Error handling goes here
+        new_post.save()
+
+        return JsonResponse("Created", safe=False)
+
+    # If type is update, update existing post with content
+    elif request.POST['type'] == 'update':
+        print("We don't make it to here.")
+        post_id = request.POST['post_id']
+        post = Post.objects.get(id=post_id)
+        post.content = content
+        # Error handling goes here
+        post.save()
+
+        return JsonResponse("Updated", safe=False)
