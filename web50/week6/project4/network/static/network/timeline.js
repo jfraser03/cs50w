@@ -51,6 +51,8 @@ function load_posts(timeline) {
     .then(response => response.json())
     .then(postList => {
         postList.forEach(post => {
+
+            // Create HTML elements for post
             let parent = document.createElement('div');
             let element = document.createElement('div');
             let user = document.createElement('p');
@@ -59,54 +61,26 @@ function load_posts(timeline) {
             let like_count = document.createElement('p');
             let timestamp = document.createElement('p');
             let edit = document.createElement('button');
-            
 
+            // Show edit post btn ONLY for user's profile
             if (timeline != 'profile'){
                 edit.style.display = 'none';
             }
 
+            // Populate HTML fields with post data
             user.innerHTML = post.username;
             content.innerHTML = post.content;
             timestamp.innerHTML = post.timestamp;
-            
-            // For each post, check to see if the user has liked it
-            let liked = false;
-            fetch(`/likes/${user_id}/${post.id}`, {
-                method: 'GET',
-                headers: {
-                    'X-CSRFToken': csrftoken,
-                    'type': 'check'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                liked = data;
-            })
-
             like_count.innerHTML = post.likes;
 
-            // Do some client-side processing to display the correct ♡ and number count
-            if (liked) {
-                like_button.innerHTML = "❤️"
-            }
-            else {
-                like_button.innerHTML = "♡"
-            }
-            console.log(liked)
+            // Check liked status for post, updating ♡
+            check_like(post, like_button)
             
-            // When like button is clicked, change the number + emoji (clientside) + update the database (server-side)
+            // Update count + ♡ and update db.
             like_button.addEventListener('click', () => {
-                toggle_like(post)
-                let likes_int = parseInt(post.likes)
-                if (liked) {
-                    like_count.innerHTML = likes_int - 1
-                }
-                else {
-                    like_count.innerHTML = likes_int + 1
-                }
+                toggle_like(post, like_count, like_button)
             })
 
-        
             // Attach each element to its parent div and organize in the DOM
             element.append(user, content, timestamp, like_button, like_count);
             parent.append(element);
@@ -124,10 +98,9 @@ function show_profile_info(user) {
 
 }
 
-function toggle_like(post) {
+function toggle_like(post, like_element, like_button) {
 
-    // Toggle like database on server-side when triggered
-    
+    // Toggle like db when triggered
     fetch(`/likes/${user_id}/${post.id}`, {
         method: 'PUT',
         headers: {
@@ -136,7 +109,45 @@ function toggle_like(post) {
         }
     })
     .then(response => response.json())
+    
+    // Update UI like count and ♡
     .then(data => {
-        console.log(data)
+        let likes = parseInt(like_element.innerHTML)
+        // data returns a Bool based on like status
+        if (data) {
+            likes += 1
+        }
+        else {
+            likes -=1
+        }
+        // Update HTML element
+        like_element.innerHTML = likes;
+
+        // Update heart status
+        heart_status(data, like_button)
     })
+}
+
+function check_like(post, like_button) {
+    return fetch(`/likes/${user_id}/${post.id}`, {
+        method: 'GET',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'type': 'check'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // data returns True/False
+        heart_status(data, like_button)
+    })
+}
+
+function heart_status(liked, btn) {
+    if (liked) {
+        btn.innerHTML = "❤️"
+    }
+    else {
+        btn.innerHTML = "♡"
+    }
 }

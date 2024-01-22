@@ -113,15 +113,14 @@ def like(request, user_id, post_id):
         try:
             like_post = Like(user=user, post=post)
             like_post.save()
-            message = "User Liked Post"
+            liked = True
         except IntegrityError:
             Like.objects.get(user=user, post=post).delete()
-            message = "User Unliked Post"
-
-        return JsonResponse({'message': message})
-    
+            liked = False
+            
     elif request.method == 'GET':
 
         liked = Like.objects.filter(user=user, post=post).exists()
+        print(f'{post.content} - Liked: {liked}')
 
-        return JsonResponse({'message': liked})
+    return JsonResponse(liked, safe=False)
