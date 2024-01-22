@@ -68,10 +68,47 @@ function load_posts(timeline) {
             user.innerHTML = post.username;
             content.innerHTML = post.content;
             timestamp.innerHTML = post.timestamp;
+            
+            // For each post, check to see if the user has liked it
+            let liked = false;
+            fetch(`/likes/${user_id}/${post.id}`, {
+                method: 'GET',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'type': 'check'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                liked = data;
+            })
+
             like_count.innerHTML = post.likes;
 
+            // Do some client-side processing to display the correct ♡ and number count
+            if (liked) {
+                like_button.innerHTML = "❤️"
+            }
+            else {
+                like_button.innerHTML = "♡"
+            }
+            console.log(liked)
+            
+            // When like button is clicked, change the number + emoji (clientside) + update the database (server-side)
+            like_button.addEventListener('click', () => {
+                toggle_like(post)
+                let likes_int = parseInt(post.likes)
+                if (liked) {
+                    like_count.innerHTML = likes_int - 1
+                }
+                else {
+                    like_count.innerHTML = likes_int + 1
+                }
+            })
+
+        
             // Attach each element to its parent div and organize in the DOM
-            element.append(user, content, timestamp, like_count);
+            element.append(user, content, timestamp, like_button, like_count);
             parent.append(element);
             postContainer.append(parent);
         })
@@ -85,4 +122,20 @@ function show_new_post() {
 function show_profile_info(user) {
     // Fetch profile info from an API route
 
+}
+
+function toggle_like(post) {
+
+    // 
+    fetch(`/likes/${user_id}/${post.id}`, {
+        method: 'PUT',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'type': 'toggle'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data)
+    })
 }

@@ -16,5 +16,10 @@
 {% endblock %}
 
 {% block script %}
+    <script>
+        var user_id = "{{ user.id }}"
+        var username = "{{ user.username }}"
+        var csrftoken = "{{ csrf_token }}"
+    </script>
     <script src="{% static 'network/timeline.js' %}"></script>
 {% endblock %}

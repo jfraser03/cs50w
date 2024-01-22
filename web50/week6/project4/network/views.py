@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import PostForm
-from .models import User, Post, Follow
+from .models import User, Post, Follow, Like
 
 
 def index(request):
@@ -86,7 +86,6 @@ def timeline(request, timeline):
         # If timeline starts with @, then the route is @username
         user = User.objects.get(username=timeline[1:])
         posts = Post.objects.filter(user=user)
-        print("We tried")
 
     else:
         return JsonResponse({"error": "Invalid timeline."}, status=400)
@@ -103,5 +102,26 @@ def profile(request, profile):
 
     return render(request, "network/index.html", variables)
 
+def like(request, user_id, post_id):
 
+    user = User.objects.get(id=user_id)
+    post = Post.objects.get(id=post_id)
 
+    if request.method == 'PUT':
+
+        # Toggle like through Like object instance
+        try:
+            like_post = Like(user=user, post=post)
+            like_post.save()
+            message = "User Liked Post"
+        except IntegrityError:
+            Like.objects.get(user=user, post=post).delete()
+            message = "User Unliked Post"
+
+        return JsonResponse({'message': message})
+    
+    elif request.method == 'GET':
+
+        liked = Like.objects.filter(user=user, post=post).exists()
+
+        return JsonResponse({'message': liked})
