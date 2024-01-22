@@ -86,6 +86,7 @@ def timeline(request, timeline):
         # If timeline starts with @, then the route is @username
         user = User.objects.get(username=timeline[1:])
         posts = Post.objects.filter(user=user)
+        print("We tried")
 
     else:
         return JsonResponse({"error": "Invalid timeline."}, status=400)
@@ -94,7 +95,13 @@ def timeline(request, timeline):
     return JsonResponse([post.serialize() for post in posts], safe=False)
 
 def profile(request, profile):
-    print("Profile routing intitiated.")
 
-    return render(request, "network/index.html")
+    user = User.objects.get(username=profile)
+
+    # serialize is a function defined in models.py that returns dict of username, and follow info
+    variables = user.serialize()
+
+    return render(request, "network/index.html", variables)
+
+
 
