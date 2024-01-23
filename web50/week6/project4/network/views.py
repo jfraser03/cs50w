@@ -129,10 +129,11 @@ def like(request, user_id, post_id):
 
 def post(request):
 
-    content = request.POST['content']
+    content = request.META.get('HTTP_CONTENT')
+    request_type = request.META.get('HTTP_TYPE')
 
     # If POST request type (custom defined) is new, make new post
-    if request.POST['type'] == 'new':
+    if request_type == 'new':
         new_post = Post(content=content, user=request.user)
         # Error handling goes here
         new_post.save()
@@ -140,9 +141,8 @@ def post(request):
         return JsonResponse("Created", safe=False)
 
     # If type is update, update existing post with content
-    elif request.POST['type'] == 'update':
-        print("We don't make it to here.")
-        post_id = request.POST['post_id']
+    elif request_type == 'update':
+        post_id = request.META.get('HTTP_POST_ID')
         post = Post.objects.get(id=post_id)
         post.content = content
         # Error handling goes here

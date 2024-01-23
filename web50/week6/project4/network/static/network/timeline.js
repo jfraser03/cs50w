@@ -168,33 +168,40 @@ function heart_status(liked, btn) {
 }
 
 function edit_content(post, html_content, edit_button, html_element) {
-    // Create new button, hide post
-    edit_button.innerHTML = 'Save';
+    // Create new button, hide post & edit button
+    edit_button.style.display = 'none';
+    let save_button = document.createElement('button')
+    save_button.innerHTML = 'Save';
+
     html_content.style.display = 'none';
 
-
     // Exchange post for edit field
-    let editing_content = document.createElement('textArea')
+    let editing_content = document.createElement('textarea')
     editing_content.value = html_content.innerHTML
     html_element.append(editing_content)
+    html_element.append(save_button)
     
     // cursor auto go to editing_content
 
     // Execute upon button click
-    edit_button.addEventListener('click', () => {
-        let contents = editing_content.value
-        save_edit(post, html_content, edit_button, html_element, editing_content, contents)
+    save_button.addEventListener('click', () => {
+        save_edit(post, html_content, edit_button, html_element, editing_content, save_button)
     })
 
 }
 
-function save_edit(post, html_content, edit_button, html_element, new_content, contents) {
+function save_edit(post, html_content, edit_button, html_element, new_content, save_button) {
     // Post content = new content (HTML)
-    html_content.innerHTML = new_content.innerHTML
+    html_content.innerHTML = new_content.value
 
     // Change HTML back
-    html_content.style.display = 'block'
-    html_element.remove(new_content)
+    html_content.style.display = 'block';
+
+    html_element.removeChild(new_content)
+    html_element.removeChild(save_button)
+    edit_button.style.display = 'block';
+
+    console.log("FLERG")
 
     // POST request to update the post with new contents
     fetch('/post', {
@@ -202,8 +209,8 @@ function save_edit(post, html_content, edit_button, html_element, new_content, c
         headers: {
             'X-CSRFToken': csrftoken,
             'type': 'update',
-            'content': new_content.innerHTML,
-            'post_id': post.id
+            'content': new_content.value,
+            'post-id': post.id
         }
     })
     .then(response => response.json())
@@ -212,5 +219,7 @@ function save_edit(post, html_content, edit_button, html_element, new_content, c
     })
 
     // Change the button back
-    edit_button.innerHTML = "Edit"
+    
+    
+
 }
