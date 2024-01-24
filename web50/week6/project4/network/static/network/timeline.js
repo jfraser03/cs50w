@@ -30,8 +30,9 @@ function load_timeline(timeline) {
         show_profile_info(timeline)
     }
 
-    if (! profile || "{{ user.username }}" == username) {
+    if (timeline == 'all' || (profile && "{{ user.username }}" == username)) {
         show_new_post()
+        console.log("New POst Flag")
     }
 
     load_posts(timeline)
@@ -105,6 +106,10 @@ function show_new_post() {
     // Show new post box in DOM with functionality
 }
 
+function new_post {
+    // Fetch POST request to server
+}
+
 function show_profile_info(username) {
 
     let profileContainer = document.getElementById('profile-info-container');
@@ -138,6 +143,7 @@ function show_profile_info(username) {
         follower_container.append(followers, follower_count)
         following_container.append(following, following_count)
         parent.append(username_element, follower_container, following_container)
+        
         // Add to the existing DOM
         profileContainer.append(parent)
     })
@@ -257,3 +263,4 @@ function save_edit(post, html_content, edit_button, btn_container, post_containe
     })
 
 }
+
