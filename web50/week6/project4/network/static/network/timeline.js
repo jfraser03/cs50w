@@ -27,13 +27,13 @@ function load_timeline(timeline) {
     }
 
     if (profile) {
-        show_profile_info(username)
+        show_profile_info(timeline)
     }
 
     if (! profile || "{{ user.username }}" == username) {
         show_new_post()
     }
-    
+
     load_posts(timeline)
 }
 
@@ -89,12 +89,12 @@ function load_posts(timeline) {
             // Attach each element to its parent div and organize in the DOM
             element.append(user, post_container, timestamp, like_button, like_count);
 
-            // Show edit post btn ONLY for user's profile
+            // Show profile info
             if (timeline.charAt(0) === '@' && post.username == username){
                 edit_container.append(edit)
                 element.append(edit_container);
             }
-
+                
             parent.append(element);
             postContainer.append(parent);
         })
@@ -105,18 +105,42 @@ function show_new_post() {
     // Show new post box in DOM with functionality
 }
 
-function show_profile_info(user) {
-    // Fetch profile info from an API route
-    
-    // Create HTML elements for profile info
-    let parent = document.createElement('div')
-    let element = document.createElement('div')
-    let username = document.createElement('h4')
-    let followers = document.createElement('p')
-    let following = document.createElement('p')
-    let follower_count = document.createElement('p')
-    let folowing_count = document.createElement('p')
+function show_profile_info(username) {
 
+    let profileContainer = document.getElementById('profile-info-container');
+    profileContainer.innerHTML = ''
+
+    // Fetch profile info from an API route
+    fetch(`info/${username}`)
+    .then(response => response.json())
+    .then(data => {
+        let follower_count_data = data.followers;
+        let following_count_data = data.following;
+
+        // Create HTML elements for profile info
+        let parent = document.createElement('div')
+        let username_element = document.createElement('h4')
+        let follower_container = document.createElement('div')
+        let following_container = document.createElement('div')
+        let followers = document.createElement('p')
+        let following = document.createElement('p')
+        let follower_count = document.createElement('p')
+        let following_count = document.createElement('p')
+
+        // Assign values to the elements
+        username_element.innerHTML = username;
+        followers.innerHTML = "Followers:"
+        following.innerHTML = "Following"
+        follower_count.innerHTML = follower_count_data;
+        following_count.innerHTML = following_count_data;
+
+        // Put elements in respective containers and add the master parent
+        follower_container.append(followers, follower_count)
+        following_container.append(following, following_count)
+        parent.append(username_element, follower_container, following_container)
+        // Add to the existing DOM
+        profileContainer.append(parent)
+    })
 }
 
 function toggle_like(post, like_element, like_button) {

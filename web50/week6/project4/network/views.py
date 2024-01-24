@@ -96,13 +96,7 @@ def timeline(request, timeline):
 
 
 def profile(request, profile):
-
-    user = User.objects.get(username=profile)
-
-    # serialize is a function defined in models.py that returns dict of username, and follow info
-    variables = user.serialize()
-
-    return render(request, "network/index.html", variables)
+    return render(request, "network/index.html")
 
 
 def like(request, user_id, post_id):
@@ -149,3 +143,7 @@ def post(request):
         post.save()
 
         return JsonResponse("Updated", safe=False)
+
+def profile_info(request, profile):
+    user = User.objects.get(username=profile)
+    return JsonResponse(user.serialize())
