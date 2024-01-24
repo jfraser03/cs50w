@@ -16,7 +16,6 @@ document.addEventListener('DOMContentLoaded', function() {
     else {
         load_timeline('all')
     }
-
 })
 
 function load_timeline(timeline) {
@@ -36,8 +35,6 @@ function load_timeline(timeline) {
     }
     
     load_posts(timeline)
-
-
 }
 
 // Request a GET response from server to fetch list of post objects
@@ -60,6 +57,9 @@ function load_posts(timeline) {
             let like_count = document.createElement('p');
             let timestamp = document.createElement('p');
             let edit = document.createElement('button');
+            let edit_container = document.createElement('div')
+            let post_container = document.createElement('div')
+            
 
             // Populate HTML fields with post data
             user.innerHTML = post.username;
@@ -78,15 +78,21 @@ function load_posts(timeline) {
 
             // Edit content functionality
             edit.addEventListener('click', () => {
-                edit_content(post, content, edit, element);
+                edit_content(post, content, edit, edit_container, post_container);
             })
 
+            // Set post content into container (with not-yet-existing 'editing' field)
+            // This is so the two elements look like they exist in the same place when they swap
+            post_container.append(content)
+
+
             // Attach each element to its parent div and organize in the DOM
-            element.append(user, content, timestamp, like_button, like_count);
+            element.append(user, post_container, timestamp, like_button, like_count);
 
             // Show edit post btn ONLY for user's profile
             if (timeline.charAt(0) === '@' && post.username == username){
-                element.append(edit);
+                edit_container.append(edit)
+                element.append(edit_container);
             }
 
             parent.append(element);
@@ -167,7 +173,7 @@ function heart_status(liked, btn) {
     }
 }
 
-function edit_content(post, html_content, edit_button, html_element) {
+function edit_content(post, html_content, edit_button, btn_container, post_container) {
     // Create new button, hide post & edit button
     edit_button.style.display = 'none';
     let save_button = document.createElement('button')
@@ -178,27 +184,35 @@ function edit_content(post, html_content, edit_button, html_element) {
     // Exchange post for edit field
     let editing_content = document.createElement('textarea')
     editing_content.value = html_content.innerHTML
-    html_element.append(editing_content)
-    html_element.append(save_button)
-    
-    // cursor auto go to editing_content
 
+    // Add the new elements to their respective containers (divs) in the DOM
+    post_container.append(editing_content)
+    btn_container.append(save_button)
+    
     // Execute upon button click
     save_button.addEventListener('click', () => {
-        save_edit(post, html_content, edit_button, html_element, editing_content, save_button)
+        save_edit(post, html_content, edit_button, btn_container, post_container, editing_content, save_button)
     })
 
+    // Cursor auto to the new text field
+    editing_content.focus()
+    editing_content.addEventListener('keydown', function(event) {
+        if (event.key === "Enter") {
+            save_edit(post, html_content, edit_button, btn_container, post_container, editing_content, save_button)
+        }
+    })
 }
 
-function save_edit(post, html_content, edit_button, html_element, new_content, save_button) {
+function save_edit(post, html_content, edit_button, btn_container, post_container, new_content, save_button) {
     // Post content = new content (HTML)
     html_content.innerHTML = new_content.value
 
     // Change HTML back
     html_content.style.display = 'block';
+    post_container.removeChild(new_content)
 
-    html_element.removeChild(new_content)
-    html_element.removeChild(save_button)
+    // Change the button back
+    btn_container.removeChild(save_button)
     edit_button.style.display = 'block';
 
     console.log("FLERG")
@@ -217,9 +231,5 @@ function save_edit(post, html_content, edit_button, html_element, new_content, s
     .then(data => {
         console.log(data)
     })
-
-    // Change the button back
-    
-    
 
 }
