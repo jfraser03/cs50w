@@ -106,7 +106,7 @@ function show_new_post() {
     // Show new post box in DOM with functionality
 }
 
-function new_post {
+function new_post() {
     // Fetch POST request to server
 }
 
