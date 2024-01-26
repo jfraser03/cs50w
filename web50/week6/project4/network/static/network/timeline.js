@@ -28,6 +28,10 @@ function load_timeline(timeline) {
 
     if (profile) {
         show_profile_info(timeline)
+        if (username != uname)
+        {
+            show_follow(timeline)
+        }
     }
 
     if (timeline == 'all' || (profile && username == uname)) {
@@ -41,6 +45,7 @@ function load_timeline(timeline) {
 function load_posts(timeline, page_number) {
 
     let postContainer = document.getElementById('posts-container');
+    
     // FOR PAGINATION:
     if (page_number == 1) {
         postContainer.innerHTML = ''
@@ -100,6 +105,53 @@ function load_posts(timeline, page_number) {
             parent.append(element);
             postContainer.append(parent);
         })
+        // PAGINATION LOGIC:
+        let post_count = postList.length;
+        let load_more = document.createElement('button');
+        
+        load_more.innerHTML = "Load more"
+
+        // The following is the chain of transitions and animations for the button
+        load_more.addEventListener('click', () => {
+            fade_out(load_more)
+        })
+
+        function fade_out(load_more) {
+            console.log("Flag one")
+            load_more.classList.add('fade-out')
+
+            function after_fade() {
+                console.log("Flag two")
+                load_more.removeEventListener('transitionend', after_fade)
+                shrink_element(load_more)
+            }
+
+            load_more.addEventListener('transitionend', after_fade)
+        }
+        
+
+        function shrink_element(load_more) {
+            console.log("Flag three")
+            load_posts(timeline, page_number + 1)
+            load_more.classList.add('shrink')
+
+            setTimeout(() => {
+                console.log("hi")
+                load_more.remove();
+            }, 300);
+        }
+        // End transition logic
+
+
+        if (post_count > 9) {
+            postContainer.append(load_more)
+        }
+
+        else {
+            let outro = document.createElement('p')
+            outro.innerHTML = "You've reached the bottom"
+            postContainer.append(outro)
+        }
     })
 }
 
@@ -295,3 +347,43 @@ function save_edit(post, html_content, edit_button, btn_container, post_containe
 
 }
 
+function show_follow(profile, ) {
+    let followContainer = document.getElementById('profile-info-container');
+    followContainer.innerHTML = ''
+
+    let follow_button = document.createElement('button')
+
+    fetch(`/follow/${profile}`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.followed) {
+            follow_button.innerHTML = "Unfollow"
+        }
+        else {
+            follow_button.innerHTML = "Follow"
+        }
+        follow_button.addEventListener('click', () => toggle_follow(profile, follow_button))
+        followContainer.append(follow_button)
+    })
+
+}
+
+function toggle_follow(profile, follow_button){
+    fetch(`/follow/${profile}`, {
+        method: "POST",
+        headers: {
+            'X-CSRFToken': csrftoken,
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.followed) {
+            console.log("FOLLOWED")
+            follow_button.innerHTML = "Unfollow"
+        }
+        else {
+            console.log("UNFOLLOWED")
+            follow_button.innerHTML = "Follow"
+        }
+    })
+}

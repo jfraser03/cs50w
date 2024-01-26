@@ -97,6 +97,9 @@ def timeline(request, timeline, page_number):
     # List of all post objects within the selected page
     objects = page_object.object_list
 
+    data = {
+        'post_count': 13,
+        }
     print("hi")
     
     return JsonResponse([post.serialize() for post in objects], safe=False)
@@ -158,3 +161,21 @@ def post(request):
 def profile_info(request, profile):
     user = User.objects.get(username=profile)
     return JsonResponse(user.serialize())
+
+def follow(request, profile):
+        
+    user = User.objects.get(username=profile)
+    followed = Follow.objects.filter(follower=request.user, following=user).exists()
+
+    if request.method == "GET":
+        return JsonResponse({'followed': followed})
+    
+    elif request.method == "POST":
+        if followed:
+            remove_follow = Follow.objects.get(follower=request.user, following=user).delete()
+            followed = False
+        else:
+            new_follow = Follow(follower=request.user, following=user)
+            new_follow.save()
+            followed = True
+        return JsonResponse({'followed': followed})
