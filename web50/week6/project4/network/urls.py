@@ -11,7 +11,7 @@ urlpatterns = [
     path("@<str:profile>", views.profile, name="profile"),
 
     # API Routes
-    path("posts/<str:timeline>", views.timeline, name="posts"),
+    path("posts/<str:timeline>/<int:page_number>", views.timeline, name="posts"),
     path("likes/<int:user_id>/<int:post_id>", views.like, name="like"),
     path("post", views.post, name="post"),
     path("info/@<str:profile>", views.profile_info, name="profile_info")

@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
 function load_timeline(timeline) {
 
     let profile = false;
-    let username = timeline.substring(1)
+    let uname = timeline.substring(1)
     if (timeline.charAt(0) === '@') {
         profile = true;
     }
@@ -30,21 +30,23 @@ function load_timeline(timeline) {
         show_profile_info(timeline)
     }
 
-    if (timeline == 'all' || (profile && "{{ user.username }}" == username)) {
+    if (timeline == 'all' || (profile && username == uname)) {
         show_new_post()
-        console.log("New POst Flag")
     }
 
-    load_posts(timeline)
+    load_posts(timeline, 1)
 }
 
 // Request a GET response from server to fetch list of post objects
-function load_posts(timeline) {
+function load_posts(timeline, page_number) {
 
     let postContainer = document.getElementById('posts-container');
-    postContainer.innerHTML = ''
+    // FOR PAGINATION:
+    if (page_number == 1) {
+        postContainer.innerHTML = ''
+    }
 
-    fetch(`/posts/${timeline}`)
+    fetch(`/posts/${timeline}/${page_number}`)
     .then(response => response.json())
     .then(postList => {
         postList.forEach(post => {
@@ -86,7 +88,6 @@ function load_posts(timeline) {
             // This is so the two elements look like they exist in the same place when they swap
             post_container.append(content)
 
-
             // Attach each element to its parent div and organize in the DOM
             element.append(user, post_container, timestamp, like_button, like_count);
 
@@ -104,10 +105,40 @@ function load_posts(timeline) {
 
 function show_new_post() {
     // Show new post box in DOM with functionality
+    let grandparent = document.getElementById('new-post-container')
+
+    let parent = document.createElement('div');
+    let form = document.createElement('form')
+    let field = document.createElement('textarea')
+    let submit = document.createElement('button')
+
+    submit.innerHTML="Submit"
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        new_post(field);
+    })
+
+    form.append(field, submit)
+    parent.append(form)
+    grandparent.append(parent)
+
+
 }
 
-function new_post() {
+function new_post(content_field) {
     // Fetch POST request to server
+    fetch('/post', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrftoken,
+            'type': 'new',
+            'content': content_field.value,
+            'post-id': 0
+        }
+    })
+    .then(data => {
+        window.location.reload()
+    })
 }
 
 function show_profile_info(username) {

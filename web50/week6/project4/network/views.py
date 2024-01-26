@@ -1,4 +1,5 @@
 from django.contrib.auth import authenticate, login, logout
+from django.core.paginator import Paginator
 from django.db import IntegrityError
 from django.db.models import Count
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -12,12 +13,7 @@ from .models import User, Post, Follow, Like
 def index(request):
     form = PostForm()
 
-    # Filter posts returned based on timeline selected
-    posts = Post.objects.annotate(likes_count=Count('likes'))
-    inputs = {
-        'form': form,
-    }
-    return render(request, "network/index.html", inputs)
+    return render(request, "network/index.html", {'form': form})
 
 
 def login_view(request):
@@ -72,8 +68,9 @@ def register(request):
         return render(request, "network/register.html")
     
       
-def timeline(request, timeline):
+def timeline(request, timeline, page_number):
     # Filter posts 'fetch' return based on selected timeline
+    
 
     following = [follow.following for follow in Follow.objects.filter(follower=request.user)]
 
@@ -92,11 +89,23 @@ def timeline(request, timeline):
         return JsonResponse({"error": "Invalid timeline."}, status=400)
     
     posts = posts.order_by("-timestamp").all()
-    return JsonResponse([post.serialize() for post in posts], safe=False)
+    
+    # PAGINATION. NEW AND UNTESTED
+    paginator = Paginator (posts, 10) #All post objects. Limit to 10 (it breaks it into groups called 'pages')
+    # Page object, holding all posts within that page
+    page_object = paginator.page(page_number)
+    # List of all post objects within the selected page
+    objects = page_object.object_list
+
+    print("hi")
+    
+    return JsonResponse([post.serialize() for post in objects], safe=False)
 
 
 def profile(request, profile):
-    return render(request, "network/index.html")
+    form = PostForm()
+
+    return render(request, "network/index.html", {'form': form})
 
 
 def like(request, user_id, post_id):
@@ -128,9 +137,11 @@ def post(request):
 
     # If POST request type (custom defined) is new, make new post
     if request_type == 'new':
+        print("Post attempted")
         new_post = Post(content=content, user=request.user)
         # Error handling goes here
         new_post.save()
+        print("Post created")
 
         return JsonResponse("Created", safe=False)
 
