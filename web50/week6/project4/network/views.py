@@ -97,11 +97,6 @@ def timeline(request, timeline, page_number):
     # List of all post objects within the selected page
     objects = page_object.object_list
 
-    data = {
-        'post_count': 13,
-        }
-    print("hi")
-    
     return JsonResponse([post.serialize() for post in objects], safe=False)
 
 
@@ -140,11 +135,9 @@ def post(request):
 
     # If POST request type (custom defined) is new, make new post
     if request_type == 'new':
-        print("Post attempted")
         new_post = Post(content=content, user=request.user)
         # Error handling goes here
         new_post.save()
-        print("Post created")
 
         return JsonResponse("Created", safe=False)
 

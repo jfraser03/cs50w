@@ -1,9 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
     
     // Load 'following' timeline
-    document.querySelector('#following').addEventListener('click', () => {
-        load_timeline('following');
-    })
+    let follow = document.querySelector('#following')
+
+    if (follow) {
+        follow.addEventListener('click', () => {load_timeline('following')})
+    }
     
     let route = window.location.pathname.substring(1)
     if (route.charAt(0) === '@') {
@@ -22,6 +24,7 @@ function load_timeline(timeline) {
 
     let profile = false;
     let uname = timeline.substring(1)
+    let title = document.getElementById('title')
     if (timeline.charAt(0) === '@') {
         profile = true;
     }
@@ -33,11 +36,22 @@ function load_timeline(timeline) {
             show_follow(timeline)
         }
     }
-
-    if (timeline == 'all' || (profile && username == uname)) {
-        show_new_post()
+    else {
+        if (timeline == 'all') {
+            title.innerHTML = "All Posts"
+        }
+        else {
+            title.innerHTML = "Following"
+        }
     }
 
+    if (timeline == 'all' || (username == uname)) {
+        show_new_post()
+    }
+    else {
+        hide_new_post()
+    }
+    
     load_posts(timeline, 1)
 }
 
@@ -59,18 +73,32 @@ function load_posts(timeline, page_number) {
             // Create HTML elements for post
             let parent = document.createElement('div');
             let element = document.createElement('div');
-            let user = document.createElement('p');
+            let user = document.createElement('a');
             let content = document.createElement('p');
             let like_button = document.createElement('button')
             let like_count = document.createElement('p');
+            let like_container = document.createElement('div')
             let timestamp = document.createElement('p');
             let edit = document.createElement('button');
             let edit_container = document.createElement('div')
             let post_container = document.createElement('div')
             
 
+            // Assign styling classes to each new element
+            element.classList.add('post-block')
+            user.classList.add('post-user')
+            content.classList.add('post-content')
+            like_button.classList.add('like-button')
+            like_count.classList.add('post-like-count')
+            timestamp.classList.add('post-timestamp')
+            edit.classList.add('post-edit-button', 'edit-button')
+            edit_container.classList.add('post-edit-block')
+            post_container.classList.add('post-content-block')
+            like_container.classList.add('like-block')
+
+            user.href = `/@${post.username}`;
             // Populate HTML fields with post data
-            user.innerHTML = post.username;
+            user.textContent = `@${post.username}`;
             content.innerHTML = post.content;
             timestamp.innerHTML = post.timestamp;
             like_count.innerHTML = post.likes;
@@ -93,8 +121,10 @@ function load_posts(timeline, page_number) {
             // This is so the two elements look like they exist in the same place when they swap
             post_container.append(content)
 
+            like_container.append(like_button, like_count)
+
             // Attach each element to its parent div and organize in the DOM
-            element.append(user, post_container, timestamp, like_button, like_count);
+            element.append(user, post_container, like_container, timestamp);
 
             // Show profile info
             if (timeline.charAt(0) === '@' && post.username == username){
@@ -117,11 +147,9 @@ function load_posts(timeline, page_number) {
         })
 
         function fade_out(load_more) {
-            console.log("Flag one")
             load_more.classList.add('fade-out')
 
             function after_fade() {
-                console.log("Flag two")
                 load_more.removeEventListener('transitionend', after_fade)
                 shrink_element(load_more)
             }
@@ -131,18 +159,14 @@ function load_posts(timeline, page_number) {
         
 
         function shrink_element(load_more) {
-            console.log("Flag three")
             load_posts(timeline, page_number + 1)
             load_more.classList.add('shrink')
 
             setTimeout(() => {
-                console.log("hi")
                 load_more.remove();
             }, 300);
         }
         // End transition logic
-
-
         if (post_count > 9) {
             postContainer.append(load_more)
         }
@@ -155,23 +179,43 @@ function load_posts(timeline, page_number) {
     })
 }
 
+function hide_new_post() {
+    function remove_children(element) {
+        while (element.firstChild){
+            element.removeChild(element.firstChild)
+        }
+    }
+
+    let grandparent = document.getElementById('new-post-container')
+    remove_children(grandparent)
+}
+
 function show_new_post() {
     // Show new post box in DOM with functionality
     let grandparent = document.getElementById('new-post-container')
 
+    let subtitle = document.createElement('h5')
     let parent = document.createElement('div');
     let form = document.createElement('form')
     let field = document.createElement('textarea')
     let submit = document.createElement('button')
 
-    submit.innerHTML="Submit"
+    // Assign styling classes to each new element
+    subtitle.classList.add('subtitle')
+    parent.classList.add('new-block')
+    field.classList.add('new-field')
+    submit.classList.add('new-button', 'stylish-button')
+    form.classList.add('new-post-form')
+
+    submit.innerHTML="Post"
+    subtitle.innerHTML="New Post"
     form.addEventListener('submit', function(e) {
         e.preventDefault();
         new_post(field);
     })
 
     form.append(field, submit)
-    parent.append(form)
+    parent.append(subtitle, form)
     grandparent.append(parent)
 
 
@@ -197,6 +241,8 @@ function show_profile_info(username) {
 
     let profileContainer = document.getElementById('profile-info-container');
     profileContainer.innerHTML = ''
+    let title = document.getElementById('title')
+    title.innerHTML = username
 
     // Fetch profile info from an API route
     fetch(`info/${username}`)
@@ -207,7 +253,6 @@ function show_profile_info(username) {
 
         // Create HTML elements for profile info
         let parent = document.createElement('div')
-        let username_element = document.createElement('h4')
         let follower_container = document.createElement('div')
         let following_container = document.createElement('div')
         let followers = document.createElement('p')
@@ -215,17 +260,25 @@ function show_profile_info(username) {
         let follower_count = document.createElement('p')
         let following_count = document.createElement('p')
 
+        // Assign styling classes to each new element
+        parent.classList.add('profile-block')
+        follower_container.classList.add('profile-follow-block')
+        following_container.classList.add('profile-follow-block')
+        followers.classList.add('profile-follow')
+        following.classList.add('profile-follow')
+        follower_count.classList.add('profile-follow-count')
+        following_count.classList.add('profile-follow-count')
+
         // Assign values to the elements
-        username_element.innerHTML = username;
         followers.innerHTML = "Followers:"
-        following.innerHTML = "Following"
+        following.innerHTML = "Following:"
         follower_count.innerHTML = follower_count_data;
         following_count.innerHTML = following_count_data;
 
         // Put elements in respective containers and add the master parent
         follower_container.append(followers, follower_count)
         following_container.append(following, following_count)
-        parent.append(username_element, follower_container, following_container)
+        parent.append(follower_container, following_container)
         
         // Add to the existing DOM
         profileContainer.append(parent)
@@ -292,11 +345,14 @@ function edit_content(post, html_content, edit_button, btn_container, post_conta
     let save_button = document.createElement('button')
     save_button.innerHTML = 'Save';
 
+    save_button.classList.add('edit-button')
+
     html_content.style.display = 'none';
 
     // Exchange post for edit field
     let editing_content = document.createElement('textarea')
     editing_content.value = html_content.innerHTML
+    editing_content.classList.add('new-field')
 
     // Add the new elements to their respective containers (divs) in the DOM
     post_container.append(editing_content)
@@ -328,8 +384,6 @@ function save_edit(post, html_content, edit_button, btn_container, post_containe
     btn_container.removeChild(save_button)
     edit_button.style.display = 'block';
 
-    console.log("FLERG")
-
     // POST request to update the post with new contents
     fetch('/post', {
         method: 'POST',
@@ -352,6 +406,8 @@ function show_follow(profile, ) {
     followContainer.innerHTML = ''
 
     let follow_button = document.createElement('button')
+
+    follow_button.classList.add('follow-button', 'stylish-button')
 
     fetch(`/follow/${profile}`)
     .then(response => response.json())

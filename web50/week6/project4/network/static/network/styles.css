@@ -1,16 +1,26 @@
+#master-container {
+    display: grid;
+    grid-template-columns: 1fr 3fr 1fr;
 
-.bold-title {
-    font-weight: bold
 }
 
-.fancy-button {
+#master-container > * {
+    grid-column: 2;
+}
+
+#title {
+    font-weight: bold;
+    margin: 20px 0px;
+}
+
+.stylish-button {
     color: white;
     background-color: #4e83b5;
     transition: background-color 0.3s
 
 }
 
-.fancy-button:hover {
+.stylish-button:hover {
     background-color: #7ebbf2;
 }
 
@@ -18,6 +28,15 @@
     border: none;
     background: none;
     cursor: pointer;
+    transition: color 0.2s;
+}
+
+.like-button:hover {
+    color: red;
+}
+
+.like-button:focus {
+    outline: none;
 }
 
 .fade-out {
@@ -28,4 +47,87 @@
 .shrink {
     height: 0;
     transition: height 3s ease-out;
+}
+
+.profile-block {
+    display: flex;
+}
+
+.profile-follow-block {
+    display: flex;
+}
+
+.profile-follow, .profile-follow-count {
+    color: gray;
+    margin: 3px;
+}
+
+.new-block {
+    outline: 1px solid #ededed;
+    padding: 10px;
+    margin: 15px;
+}
+
+.new-post-form * {
+    display: block;
+}
+
+.new-field {
+    width: 100%;
+    resize: none;
+}
+
+.new-button {
+    margin: 5px;
+}
+
+.post-block {
+    outline: 1px solid #ededed;
+    padding: 10px;
+    margin: 30px 0px;
+}
+
+.edit-button {
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    color: #42b2db;
+}
+
+.edit-button:focus {
+    outline: none;
+}
+
+.post-user {
+    color: gray;
+}
+
+.post-user:hover {
+    cursor: pointer;
+    color: #42b2db;
+    text-decoration: none;
+}
+
+.post-content {
+    outline: 1px solid #f0f0f0;
+    padding: 10px;
+}
+
+.like-block {
+    display: flex;
+    align-items: center;
+}
+
+.like-block * {
+    margin: 0px 5px;
+    padding: 0px;
+}
+
+.post-like-count {
+    color: gray;
+}
+
+.post-timestamp {
+    color: gray;
 }
