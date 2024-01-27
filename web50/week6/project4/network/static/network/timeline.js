@@ -3,20 +3,33 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load 'following' timeline
     let follow = document.querySelector('#following')
 
-    if (follow) {
-        follow.addEventListener('click', () => {load_timeline('following')})
+    if (authenticated == "True"){
+        authenticated = true
     }
-    
-    let route = window.location.pathname.substring(1)
-    if (route.charAt(0) === '@') {
-        load_timeline(route)
-    }
-    else if (window.location.href.endsWith('#')) {
-        load_timeline('following')
-    }
-    // Load all posts by default
     else {
-        load_timeline('all')
+        authenticated = false
+    }
+
+    if (!authenticated) {
+        load_posts('all', 1)
+    }
+
+    else if(authenticated) {
+        if (follow) {
+            follow.addEventListener('click', () => {load_timeline('following')})
+        }
+        
+        let route = window.location.pathname.substring(1)
+        if (route.charAt(0) === '@') {
+            load_timeline(route)
+        }
+        else if (window.location.href.endsWith('#')) {
+            load_timeline('following')
+        }
+        // Load all posts by default
+        else {
+            load_timeline('all')
+        }
     }
 })
 
@@ -57,7 +70,6 @@ function load_timeline(timeline) {
 
 // Request a GET response from server to fetch list of post objects
 function load_posts(timeline, page_number) {
-
     let postContainer = document.getElementById('posts-container');
     
     // FOR PAGINATION:
@@ -105,13 +117,17 @@ function load_posts(timeline, page_number) {
             edit.innerHTML = "Edit"
 
             // Check liked status for post, updating ♡
-            check_like(post, like_button)
+            if (authenticated){
+                check_like(post, like_button)
+                // Update count + ♡ and update db.
+                like_button.addEventListener('click', () => {
+                    toggle_like(post, like_count, like_button)
+                })
+            }
+            else {
+                like_button.innerHTML = "♡"
+            }
             
-            // Update count + ♡ and update db.
-            like_button.addEventListener('click', () => {
-                toggle_like(post, like_count, like_button)
-            })
-
             // Edit content functionality
             edit.addEventListener('click', () => {
                 edit_content(post, content, edit, edit_container, post_container);

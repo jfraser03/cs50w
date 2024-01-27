@@ -70,9 +70,8 @@ def register(request):
       
 def timeline(request, timeline, page_number):
     # Filter posts 'fetch' return based on selected timeline
-    
-
-    following = [follow.following for follow in Follow.objects.filter(follower=request.user)]
+    if request.user.is_authenticated:
+        following = [follow.following for follow in Follow.objects.filter(follower=request.user)]
 
     if timeline == 'all':
         posts = Post.objects.all()
